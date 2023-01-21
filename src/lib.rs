@@ -8,6 +8,7 @@ use identity_iota::account_storage::Stronghold;
 use identity_iota::prelude::*;
 
 pub mod error;
+pub mod interface;
 
 use error::Result;
 
@@ -59,7 +60,6 @@ pub struct Subject {
     keypair: KeyPair,
     account: Account,
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;

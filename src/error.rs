@@ -4,12 +4,24 @@ use thiserror::Error;
 /// Variants of service-specific errors.
 #[derive(Error, Debug)]
 pub enum DidPlaygroundError {
+    #[error("could not send hello to remote subject")]
+    Hello,
     #[error(transparent)]
-    IotaDidAccount(#[from] identity_iota::account::Error),
+    Reqwest(#[from] reqwest::Error),
     #[error(transparent)]
-    IotaDidStorage(#[from] identity_iota::account_storage::Error),
+    Io(#[from] std::io::Error),
     #[error(transparent)]
-    IotaDidCore(#[from] identity_iota::core::Error),
+    IotaCore(#[from] identity_iota::iota_core::Error),
+    #[error(transparent)]
+    Did(#[from] identity_iota::did::Error),
+    #[error(transparent)]
+    DidClient(#[from] identity_iota::client::Error),
+    #[error(transparent)]
+    DidAccount(#[from] identity_iota::account::Error),
+    #[error(transparent)]
+    DidStorage(#[from] identity_iota::account_storage::Error),
+    #[error(transparent)]
+    DidCore(#[from] identity_iota::core::Error),
     #[error("required env variable unset")]
     EnvVar(#[from] std::env::VarError),
 }
