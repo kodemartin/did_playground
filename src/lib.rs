@@ -48,10 +48,12 @@ impl SubjectBuilder {
             .storage(storage)
             .create_identity(identity_setup)
             .await?;
-        Ok(Subject {
+        let subject = Subject {
             keypair: self.keypair,
             account,
-        })
+        };
+        tracing::info!("Created DID document: {:?}", subject.account.document());
+        Ok(subject)
     }
 }
 
