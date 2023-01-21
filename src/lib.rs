@@ -10,14 +10,15 @@ use identity_iota::prelude::*;
 pub mod error;
 pub mod interface;
 
-use error::Result;
+use error::{DidPlaygroundError::MissingEnvVariable, Result};
 
 /// Default storage path
 static STORAGE_PATH: &str = "./key_manager.hodl";
 
 /// Get access to the account storage
 async fn storage() -> Result<Stronghold> {
-    let password = env::var("STRONGHOLD_PASSWORD")?;
+    let password = env::var("STRONGHOLD_PASSWORD")
+        .map_err(|_| MissingEnvVariable("STRONGHOLD_PASSWORD".into()))?;
     let path = env::var("STRONGHOLD_PATH").unwrap_or_else(|_| STORAGE_PATH.into());
     Ok(Stronghold::new(&path, password, None).await?)
 }

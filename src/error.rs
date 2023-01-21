@@ -22,8 +22,8 @@ pub enum DidPlaygroundError {
     DidStorage(#[from] identity_iota::account_storage::Error),
     #[error(transparent)]
     DidCore(#[from] identity_iota::core::Error),
-    #[error("required env variable unset")]
-    EnvVar(#[from] std::env::VarError),
+    #[error("missing env variable: {0}")]
+    MissingEnvVariable(String),
 }
 
 /// Alias for a `std::result::Result` that always return an error of type [`DidPlaygroundError`][].
