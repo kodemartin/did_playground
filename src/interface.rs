@@ -36,6 +36,22 @@ impl From<(Subject, Resolver)> for SubjectInterface {
 }
 
 impl SubjectInterface {
+    /// The service endpoint for authentication
+    pub const AUTH_ENDPOINT: &str = "/auth";
+
+    /// Get the Url of the service that manages authentication.
+    ///
+    /// This is the "local" alternative to any service added
+    /// to the DID document itself. See more in the [docs][adding-a-service].
+    ///
+    /// [adding-a-service]: https://wiki.iota.org/identity.rs/concepts/decentralized_identifiers/update/#adding-a-service
+    pub fn auth_url(&self) -> reqwest::Url {
+        reqwest::Url::try_from(format!("http://localhost:{}", self.port).as_str())
+            .expect("this should be a valid base url")
+            .join(Self::AUTH_ENDPOINT)
+            .expect("this should be a valid endpoint")
+    }
+
     /// Get the tcp port of the interface
     pub fn port(&self) -> u16 {
         self.port
@@ -45,14 +61,10 @@ impl SubjectInterface {
     ///
     /// Upon successful authentication, the remote subject sends
     /// a message to let this subject proceed with mutual authentication
-    pub async fn handshake(&self, remote_endpoint: impl IntoUrl) -> Result<()> {
+    pub async fn handshake(&self, remote_url: impl IntoUrl) -> Result<()> {
         let request = AuthRequest::try_from(&*self.subject)?;
-        let url = remote_endpoint
-            .into_url()?
-            .join("auth")
-            .expect("this should be a valid path");
         let response = reqwest::Client::new()
-            .post(url)
+            .post(remote_url)
             .json(&request)
             .send()
             .await?
@@ -76,7 +88,7 @@ impl SubjectInterface {
         self.port = port;
 
         let service = Router::new()
-            .route("/auth", post(auth))
+            .route(Self::AUTH_ENDPOINT, post(auth))
             .layer(Extension(Arc::clone(&self.subject)))
             .layer(Extension(Arc::clone(&self.resolver)));
         // TODO: Store the JoinHandle to enable aborting
@@ -94,6 +106,8 @@ impl SubjectInterface {
 
         Ok(())
     }
+
+
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

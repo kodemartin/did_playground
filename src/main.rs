@@ -40,7 +40,7 @@ async fn main() -> Result<()> {
     bob.up().await?;
     tracing::info!("Starting handshake between alice and bob");
     alice
-        .handshake(format!("http://localhost:{}", bob.port()))
+        .handshake(bob.auth_url())
         .await?;
     tracing::info!("Alice and bob have been mutually authenticated!");
 
