@@ -106,8 +106,6 @@ impl SubjectInterface {
 
         Ok(())
     }
-
-
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
