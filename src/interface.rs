@@ -17,6 +17,7 @@ use crate::error::{DidPlaygroundError, Result};
 use crate::Subject;
 
 /// Web interface of a subject
+#[derive(Debug)]
 pub struct SubjectInterface {
     subject: Arc<Subject>,
     resolver: Arc<Resolver>,
@@ -63,12 +64,12 @@ impl SubjectInterface {
     /// a message to let this subject proceed with mutual authentication
     pub async fn handshake(&self, remote_url: impl IntoUrl) -> Result<()> {
         let request = AuthRequest::try_from(&*self.subject)?;
-        let response = reqwest::Client::new()
+        let response: Option<AuthRequest> = reqwest::Client::new()
             .post(remote_url)
             .json(&request)
             .send()
             .await?
-            .json::<Option<AuthRequest>>()
+            .json()
             .await?;
         if let Some(remote_msg) = response {
             remote_msg.verify(&self.resolver).await

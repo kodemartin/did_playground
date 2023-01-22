@@ -24,6 +24,7 @@ async fn storage() -> Result<Stronghold> {
 }
 
 /// Build a [`Subject`]
+#[derive(Debug)]
 pub struct SubjectBuilder {
     keypair: KeyPair,
     account_builder: AccountBuilder,
@@ -59,21 +60,8 @@ impl SubjectBuilder {
 }
 
 /// A subject with a decentralized identifier (DID)
+#[derive(Debug)]
 pub struct Subject {
     keypair: KeyPair,
     account: Account,
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn create_subject() {
-        let subject = SubjectBuilder::new().unwrap().build().await.unwrap();
-        println!(
-            "{}: {:#?}",
-            subject.account.did(),
-            subject.account.document()
-        );
-    }
 }
